@@ -1,0 +1,14 @@
+*.swp
+*.swo
+*.out
+test_main
+*.o
+*.config
+*.creator
+*.creator.user
+*.files
+*.includes
+*.pro
+*.pro.user
+run.sh
+

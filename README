@@ -1,0 +1,112 @@
+   ====================================
+    PBSM --- Proxy-Based Shared Memory
+   ====================================
+
+====================
+1. INTRODUCTION
+====================
+
+PBSM (Proxy-Based Shared Memory) is a distributed programming technique
+which consists in detecting read/write operations on data through a Proxy
+and handling data coherency through a hidden run-time library.
+
+This repository contains a C++ library to implement PBSM through templates
+and function overloading.
+
+Work-in-progress.
+
+
+====================
+2. BUILD STEPS
+====================
+
+Run the following commands:
+
+	make
+	make install
+
+The executables are available in the bin/ directory
+
+====================
+3. SETUP
+====================
+
+The file /etc/pbsm/hosts.conf must contain the list of IP addresses of all nodes.
+This file must be the same on all machines.
+
+====================
+4. APPLICATION CODE
+====================
+
+4.1 INCLUDES AND MAIN FUNCTION
+
+The application code must include the file "pbsm.hpp":
+	
+	#include "pbsm.hpp"
+
+Moreover, the main() function must call
+
+		pbsm_init(argc, argv);
+
+at the beginning to initialize the run-time.
+
+See the example in the apps/ directory.
+
+
+4.2 VARIABLES
+
+Variables shared across nodes can be defined as follows:
+
+       shared<int> a (PBSM);
+       a = 5;
+       a++;
+       int b = a;
+       func(a);
+
+Shared variables can also be of user-defined types:
+
+       class myclass {
+       public:
+       	void mymethod();
+       	//...
+       };
+
+       shared <myclass> a (PBSM);
+       a.mymethod();
+
+It is also possible to define arrays of any data type:
+
+       shared<std::array<int, 100>> better_array (PBSM);
+
+
+4.3 FUNCTION CALLS
+
+Functions can accept pointers and references to shared variables as arguments:
+
+       void func(shared<int>& par)
+       {
+       	// ...
+       }
+
+
+4.4 NODE IDENTIFICATION
+
+pbsm_tid is a variable containing the node id (0 is the master thread).
+
+pbsm_hosts is a variable containing the total number of nodes.
+
+
+4.5 BARRIERS
+
+The macro PBSM_BARRIER() creates a barrier among all nodes in the code.
+
+
+====================
+5. RUNNING
+====================
+
+The application must be linked to the pthread and pbsm libraries (see the file
+apps/Makefile for an example).
+
+When running the application, the first parameter must specify the entry of the
+machine in the /etc/pbsm/hosts.conf.
